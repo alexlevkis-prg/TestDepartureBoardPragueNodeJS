@@ -3,10 +3,11 @@ const requestHelper = require('./helpers/requestHelper');
 const emojiHelper = require('./helpers/emojiHelper');
 const messageHelper = require('./helpers/messageHelper');
 const suggestionHelper = require('./helpers/suggestionHelper');
+const config = require('./config');
 const fs = require('fs');
 
 require('dotenv').config();
-const token = process.env.clientToken
+const token = config.clientToken;
 const bot = new TelegramBot(token, {polling: true});
 var locationMessageId = 0;
 var suggestionMessageId = 0;
