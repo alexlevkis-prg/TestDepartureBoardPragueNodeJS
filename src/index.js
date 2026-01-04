@@ -9,9 +9,6 @@ const fs = require('fs');
 require('dotenv').config();
 const token = config.clientToken;
 const bot = new TelegramBot(token, {polling: true});
-var locationMessageId = 0;
-var suggestionMessageId = 0;
-var textMessageId = 0;
 
 bot.on('message', async (msg) => {
     try {
@@ -54,9 +51,7 @@ bot.on('message', async (msg) => {
                             inline_keyboard: buttonsArray
                         })
                     };
-                    bot.sendMessage(msg.chat.id ?? process.env.clientId, "Please select suggestion", options).then((m) =>{
-                        suggestionMessageId = m.message_id
-                    });
+                    bot.sendMessage(msg.chat.id ?? process.env.clientId, "Please select suggestion", options);
                 } else {
                     bot.sendMessage(msg.chat.id ?? process.env.clientId, "Sorry but there are no any suggestions by your text. Please try to type another one.");
                 }
@@ -67,7 +62,7 @@ bot.on('message', async (msg) => {
     }
 });
 
-bot.on('callback_query', function onCallbackQuery(query) {
+bot.on('callback_query', async function onCallbackQuery(query) {
     try {
         const data = query.data;
         if (data.includes('Stop:')) { //processing selected stop
@@ -87,7 +82,7 @@ bot.on('callback_query', function onCallbackQuery(query) {
                     if (stop.stops.length > 2) {
                         let buttonsArray = [];
                         for(let j = 0; j < stop.stops.length; j++) {
-                            if (stop.stops[j].mainTrafficType != "unknown" || stop.stops[j].mainTrafficType != "undefined") {
+                            if (stop.stops[j].mainTrafficType !== "unknown" || stop.stops[j].mainTrafficType !== "undefined") {
                                 if (j % 2 == 0) {
                                     buttonsArray.push([]); 
                                     buttonsArray[buttonsArray.length - 1]
@@ -110,13 +105,8 @@ bot.on('callback_query', function onCallbackQuery(query) {
                             }),
                             parse_mode: "HTML"
                         };
-                        deleteMessages(query.message.chat.id ?? process.env.clientId).then(() => {
-                            bot.sendLocation(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon).then((l) => {
-                            locationMessageId = l.message_id
-                                bot.sendMessage(query.message.chat.id ?? process.env.clientId, "<b>"+stop.name+"</b>. Please select stop", options).then((m) =>{
-                                    textMessageId = m.message_id
-                                });
-                            });
+                        deleteMessage(query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
+                            bot.sendMessage(query.message.chat.id ?? process.env.clientId, "<b>"+stop.name+"</b>. Please select stop", options);
                         });
                     } else {
                         var gtfsIds = [];
@@ -128,7 +118,7 @@ bot.on('callback_query', function onCallbackQuery(query) {
                             requestHelper.getInfoTexts(gtfsIds).then((info) => {
                                 var infoTextsObject = JSON.parse(info).infotexts;
                                 var departureBoardMessage = messageHelper.buildDepartureBoardMessage(departureBoardObject, stopName, infoTextsObject);
-                                deleteMessages(query.message.chat.id ?? process.env.clientId).then(() => {
+                                deleteMessage(query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
                                     bot.sendLocation(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon).then(() => {
                                         var opts = {
                                             parse_mode: "HTML"
@@ -172,7 +162,7 @@ bot.on('callback_query', function onCallbackQuery(query) {
                         requestHelper.getInfoTexts(gtfsIds).then((info) => {
                             var infoTextsObject = JSON.parse(info).infotexts;
                             var departureBoardMessage = messageHelper.buildDepartureBoardMessage(departureBoardObject, selectedPlatform.altIdosName, infoTextsObject);
-                            deleteMessages(query.message.chat.id ?? process.env.clientId).then(() => {
+                            deleteMessage(query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
                                 bot.sendLocation(query.message.chat.id ?? process.env.clientId, lat, lon).then(() => {
                                     var opts = {
                                         parse_mode: "HTML"
@@ -197,53 +187,17 @@ bot.on('callback_query', function onCallbackQuery(query) {
     }
 });
 
-function deleteMessages(chatId) {
+function deleteMessage(chatId, messageId) {
     return new Promise((resolve, reject) => {
-        if (textMessageId > 0) {
-            bot.deleteMessage(chatId, textMessageId).then(() => {
-                textMessageId = 0;
-                if (locationMessageId > 0) {
-                    bot.deleteMessage(chatId, locationMessageId).then(() => {
-                        locationMessageId = 0;
-                        if (suggestionMessageId > 0) {
-                            bot.deleteMessage(chatId, suggestionMessageId).then(() => {
-                                suggestionMessageId = 0;
-                                resolve(1);
-                            }).catch(() => {
-                                reject(-1);
-                            }); 
-                        }
-                        resolve(1);
-                    }).catch(() => {
-                        reject(-1);
-                    }); 
-                }
-                resolve(1);
-            }).catch(() => {
-                reject(-1);
-            });      
-        } else if (locationMessageId > 0) {
-            bot.deleteMessage(chatId, locationMessageId).then(() => {
-                locationMessageId = 0;
-                if (suggestionMessageId > 0) {
-                    bot.deleteMessage(chatId, suggestionMessageId).then(() => {
-                        suggestionMessageId = 0;
-                        resolve(1);
-                    }).catch(() => {
-                        reject(-1);
-                    }); 
-                }
-                resolve(1);
-            }).catch(() => {
-                reject(-1);
+        if (messageId > 0) {
+            bot.deleteMessage(chatId, messageId).then(() => {
+                resolve(true);
+            }).catch((ex) => {
+                console.error(ex.message);
+                reject(false);
             });
-        } else if (suggestionMessageId > 0) {
-            bot.deleteMessage(chatId, suggestionMessageId).then(() => {
-                suggestionMessageId = 0;
-                resolve(1);
-            }).catch(() => {
-                reject(-1);
-            }); 
-        }   
+        } else {
+            resolve(true)
+        }
     });
 }
