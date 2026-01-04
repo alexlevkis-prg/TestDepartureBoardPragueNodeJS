@@ -39,7 +39,7 @@ bot.on('message', async (msg) => {
                     }
                     return acc;
                 }, []);
-                if(stops.length > 1) {
+                if(stops.length >= 1) {
                     let buttonsArray = [];
                     for(let i = 0; i < stops.length; i++) {
                         if (i % 2 == 0) {
@@ -54,9 +54,11 @@ bot.on('message', async (msg) => {
                             inline_keyboard: buttonsArray
                         })
                     };
-                    bot.sendMessage(msg.chat.id, "Please select suggestion", options).then((m) =>{
+                    bot.sendMessage(msg.chat.id ?? process.env.clientId, "Please select suggestion", options).then((m) =>{
                         suggestionMessageId = m.message_id
                     });
+                } else {
+                    bot.sendMessage(msg.chat.id ?? process.env.clientId, "Sorry but there are no any suggestions by your text. Please try to type another one.");
                 }
             });     
         }
@@ -85,7 +87,7 @@ bot.on('callback_query', function onCallbackQuery(query) {
                     if (stop.stops.length > 2) {
                         let buttonsArray = [];
                         for(let j = 0; j < stop.stops.length; j++) {
-                            if (stop.stops[j].mainTrafficType != "unknown") {
+                            if (stop.stops[j].mainTrafficType != "unknown" || stop.stops[j].mainTrafficType != "undefined") {
                                 if (j % 2 == 0) {
                                     buttonsArray.push([]); 
                                     buttonsArray[buttonsArray.length - 1]
