@@ -29,4 +29,12 @@ function getAdditionalVehicleEmojis(vehicle) {
     return sb.join("");
 }
 
-module.exports = { getTransportEmoji, getAdditionalVehicleEmojis }
+function getAdditionalPlatformEmojis(platform) {
+    if (platform.wheelchairAccess && platform.wheelchairAccess === "possible") {
+        return "♿️";
+    } else {
+        return "";
+    }
+}
+
+module.exports = { getTransportEmoji, getAdditionalVehicleEmojis, getAdditionalPlatformEmojis }

@@ -9,6 +9,9 @@ function getLocalizationPath(language) {
         case 'uk': {
             return 'localization/uk';
         }
+        case 'cs': {
+            return 'localization/cs';
+        }
         default: {
             return 'localization/en';
         }

@@ -8,7 +8,13 @@
     {"key": "InTitle", "value": "in"},
     {"key": "DelayingForTitle", "value": "delaying for"},
     {"key": "ArrivedTitle", "value": "arrived"},
-    {"key": "PlatformTitle", "value": "Platform"},
+    {"key": "PlatformTitleFull", "value": "Platform"},
+    {"key": "PlatformTitleShort", "value": "Plat."},
+    {"key": "StationTitleFull", "value": "Station"},
+    {"key": "StationTitleShort", "value": "St."},
+    {"key": "MetroTitleFull", "value": "Metro station"},
+    {"key": "MetroTitleShort", "value": "St."},
+    {"key": "TrackTitle", "value": "Track"},
     {"key": "CancelledTitle", "value": "cancelled"},
     {"key": "MinuteTitleNominative", "value": "minute"},
     {"key": "MinuteTitleNonNominative", "value": "minute"},
@@ -16,5 +22,5 @@
     {"key": "MinutesMore5Title", "value": "minutes"},
     {"key": "LanguageChangedMessage", "value": "The language setting has been changed"},
     {"key": "WelcomeMessage", "value": "Welcome to the <b>Departure Board. Prague</b> bot.\r\nTo start using it please type here the stop/station name.\r\n<b><i>(The bot supports Cyrilic letters.)</i></b>\r\nThe bot will return you info about the nearest public transport for your stop/station\r\nIf your stop/station has multiple transport types, the bot will suggest you to select particular one.\r\n"},
-    {"key": "HelpMessage", "value": "This bot has several commands: \r\n\t/start - Starts bot conversation \r\n\t/settings - Allows you select language \r\n\t/help - Shows help message \r\n"}
+    {"key": "HelpMessage", "value": "This bot has several commands: \r\n\t/start - Starts bot conversation \r\n\t/settings - Allows you select language \r\n\t/help - Shows help message \r\n\r\n\r\nList of signs:\r\n\t1.🚌 - bus;\r\n\t2.🚎 - trolleybus;\r\n\t3.🚊 - tram;\r\n\t4.🚇 - metro;\r\n\t5.⛴ - ferry;\r\n\t6.🚋 - train;\r\n\t7.🚠 - funicular\r\n\r\nAdditional signs:\r\n\t1.♿️ - transport available for disabled passengers\r\n\t2.❄️ - transport equipped by air conditioner system\r\n\t3.🔋 - transport equipped by sockets for device charging"}
 ]

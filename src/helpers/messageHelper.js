@@ -11,7 +11,7 @@ function buildDepartureBoardMessage(departureBoard, stopName, infoTexts, localiz
         departureBoard.forEach(db => {
             if (db.length > 0) {
                 var platformCode = db[0].stop.platform_code;
-                stringBuilder.push("<b>"+getPlatformTitle(localizedProperties)+" "+platformCode+"</b>\r\n");
+                stringBuilder.push("<b>"+getOnlyPlatformTitle(localizedProperties, db[0].route.type)+" "+platformCode+"</b>\r\n");
                 db.forEach(platformDeparture => {
                     var platformInfoTexts = infoTexts.filter(i => i.related_stops.some(s => s === platformDeparture.stop.id));
                     putInfoTexts(platformInfoTexts, stringBuilder);
@@ -97,8 +97,39 @@ function getArrivedTitle(localizedProperties) {
     return localizedProperties.find(lp => lp.key === 'ArrivedTitle')?.value ?? '';
 }
 
-function getPlatformTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'PlatformTitle')?.value ?? '';
+function getOnlyPlatformTitle(localizedProperties, transportType) {
+    if (transportType.includes("metro")) {
+        return localizedProperties.find(lp => lp.key === 'TrackTitle')?.value ?? '';
+    } else if(transportType.includes("train")) { 
+        return localizedProperties.find(lp => lp.key === 'StationTitleFull')?.value ?? '';
+    } else {
+        return localizedProperties.find(lp => lp.key === 'PlatformTitleFull')?.value ?? '';
+    }
+}
+
+function getPlatformTitle(localizedProperties, platform, stopName) {
+    if (stopName != platform.altIdosName) {
+        var point = '';
+        if (platform.mainTrafficType.includes("metro")) {
+            point = 'MetroTitleShort'
+        } else if (platform.mainTrafficType.includes("train")) {
+            point = 'StationTitleShort'
+        } else {
+            point = 'PlatformTitleShort'
+        }
+        var localizedPlatformTitle = localizedProperties.find(lp => lp.key === point)?.value ?? '';
+        return localizedPlatformTitle+" "+platform.platform+" "+platform.altIdosName.replace(stopName, '').trim();
+    }
+    var point = '';
+        if (platform.mainTrafficType.includes("metro")) {
+            point = 'MetroTitleFull'
+        } else if (platform.mainTrafficType.includes("train")) {
+            point = 'StationTitleFull'
+        } else {
+            point = 'PlatformTitleFull'
+        }
+    var localizedPlatformTitle = localizedProperties.find(lp => lp.key === point)?.value ?? '';
+    return localizedPlatformTitle+" "+platform.platform
 }
 
 function getCancelledTitle(localizedProperties) {
@@ -153,6 +184,7 @@ module.exports = {
     getNoSuggestionsMessage,
     deleteMessage,
     getPlatformTitle,
+    getOnlyPlatformTitle,
     getSelectStopMessage,
     buildSettingsMessage,
     buildLanguageChangedMessage,

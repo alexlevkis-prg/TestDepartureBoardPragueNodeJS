@@ -7,16 +7,21 @@ const command = async (bot, chatId, language) => {
         let buttonsArray = [];
         buttonsArray.push([]);
         buttonsArray[0].push({
+            text: '🇨🇿 Čeština',
+            callback_data: 'cs'
+        });
+        buttonsArray.push([]);
+        buttonsArray[1].push({
             text: '🇬🇧 English',
             callback_data: 'en'
         });
         buttonsArray.push([]);
-        buttonsArray[1].push({
+        buttonsArray[2].push({
             text: '🇷🇺 Русский',
             callback_data: 'ru'
         });
         buttonsArray.push([]);
-        buttonsArray[2].push({
+        buttonsArray[3].push({
             text: '🇺🇦 Українська',
             callback_data: 'uk'
         });

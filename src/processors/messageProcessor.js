@@ -23,7 +23,14 @@ const process = async (bot, message, language) => {
                 if (message.text.match(/[a-z]/i)) {
                     stopNameVariations = suggestionHelper.getSuggestion(message.text.toLowerCase());
                 } else {
-                    stopNameVariations = suggestionHelper.translitRussianText(message.text.toLowerCase());
+                    var translit = '';
+                    if (language == 'uk') {
+                        translit = suggestionHelper.translitRussianText(message.text.toLowerCase());
+                    }
+                    if (language == 'ru') {
+                        translit = suggestionHelper.translitRussianText(message.text.toLowerCase());
+                    }
+                    stopNameVariations = suggestionHelper.getSuggestion(translit);
                 }
                 if (result.stopGroups && result.stopGroups.length > 0) {
                     let stops = result.stopGroups.reduce((acc, sg) => {

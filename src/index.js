@@ -38,14 +38,14 @@ bot.on('message', async (msg) => {
         } else {
             var userLangs = JSON.parse(data);
             var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
-            messageProcessor.process(bot, msg, userLang ?? 'en');
+            messageProcessor.process(bot, msg, userLang ?? 'en', process.env.stopsUrl);
         }
     });
 });
 
 bot.on('callback_query', async function onCallbackQuery(query) {
     if (config.supportedLanguage.includes(query.data)) {
-        callbackProcessor.setLanguage(bot, query.message.chat.id, query);
+        callbackProcessor.setLanguage(bot, query.message.chat.id, query, process.env.stopsUrl);
     } else {
         fs.readFile(fullPath, (err, data) => {
             if (err) {
@@ -66,7 +66,7 @@ bot.onText(/\/start/, (msg, match) => {
         } else {
             var userLangs = JSON.parse(data);
             var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
-            startCommand.command(bot, msg.chat.id ?? process.env.clientId, userLang ?? 'en');
+            startCommand.command(bot, msg.chat.id ?? config.clientId, userLang ?? 'en');
         }
     });
 });
@@ -78,7 +78,7 @@ bot.onText(/\/settings/, (msg, match) => {
         } else {
             var userLangs = JSON.parse(data);
             var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
-            settingsCommand.command(bot, msg.chat.id ?? process.env.clientId, userLang ?? 'en');
+            settingsCommand.command(bot, msg.chat.id ?? config.clientId, userLang ?? 'en');
         }
     });
 });
@@ -90,7 +90,7 @@ bot.onText(/\/help/, (msg, match) => {
         } else {
             var userLangs = JSON.parse(data);
             var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
-            helpCommand.command(bot, msg.chat.id ?? process.env.clientId, userLang ?? 'en');
+            helpCommand.command(bot, msg.chat.id ?? config.clientId, userLang ?? 'en');
         }
     });
 });

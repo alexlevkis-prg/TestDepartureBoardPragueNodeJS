@@ -1,10 +1,11 @@
 const https = require('https');
+const config = require('../config');
 
 function getDepartureBoard(gtfsIds) {
     return new Promise(function(resolve, reject) {
          var options = {
             headers: {
-                "X-Access-Token": process.env.apiToken
+                "X-Access-Token": config.apiToken
             }  
         }
         var parameters = [];
@@ -22,7 +23,7 @@ function getDepartureBoard(gtfsIds) {
         parameters.push("&limit=5");
         parameters.push("&minutesAfter=60");
         var paramString = parameters.join('');
-        https.get(process.env.apiUrl+'/v2/public/departureboards'+paramString, options, response => {
+        https.get(config.apiUrl+'/v2/public/departureboards'+paramString, options, response => {
             if (response.statusCode != 200) {
                 reject("Bad request");
             } else {
@@ -49,7 +50,7 @@ function getInfoTexts(gtfsIds) {
     return new Promise(function(resolve, reject) {
         var options = {
             headers: {
-                "X-Access-Token": process.env.apiToken
+                "X-Access-Token": config.apiToken
             }  
         }
         var parameters = [];
@@ -62,7 +63,7 @@ function getInfoTexts(gtfsIds) {
         }
         parameters.push("&minutesBefore=10&minutesAfter=60&preferredTimezone=Europe_Prague&mode=departures&order=real&filter=routeOnce&limit=20&total=0&offset=0");
         var paramString = parameters.join('');
-        https.get(process.env.apiUrl+'/v2/pid/departureboards'+paramString, options, response => {
+        https.get(config.apiUrl+'/v2/pid/departureboards'+paramString, options, response => {
             if (response.statusCode != 200) {
                 reject("Bad request");
             } else {

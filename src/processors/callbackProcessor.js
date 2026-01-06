@@ -30,21 +30,13 @@ const process = async (bot, query, language) => {
                         if (stop.stops.length > 2) {
                             let buttonsArray = [];
                             for(let j = 0; j < stop.stops.length; j++) {
-                                if (stop.stops[j].mainTrafficType !== "unknown" || stop.stops[j].mainTrafficType !== "undefined") {
-                                    if (j % 2 == 0) {
-                                        buttonsArray.push([]); 
-                                        buttonsArray[buttonsArray.length - 1]
-                                            .push({
-                                                text: emojiHelper.getTransportEmoji(stop.stops[j].mainTrafficType)+' '+messageHelper.getPlatformTitle(localizedProperties)+' '+stop.stops[j].platform,
-                                                callback_data: 'Platform:'+stop.stops[j].platform+';StopName:'+stop.name
-                                            });
-                                    } else {
-                                        buttonsArray[buttonsArray.length - 1]
-                                            .push({
-                                                text: emojiHelper.getTransportEmoji(stop.stops[j].mainTrafficType)+' '+messageHelper.getPlatformTitle(localizedProperties)+' '+stop.stops[j].platform,
-                                                callback_data: 'Platform:'+stop.stops[j].platform+';StopName:'+stop.name
-                                            });
-                                    }
+                                if (stop.stops[j].mainTrafficType !== "unknown" && stop.stops[j].mainTrafficType !== "undefined") {
+                                    buttonsArray.push([]); 
+                                    buttonsArray[buttonsArray.length - 1]
+                                        .push({
+                                            text: emojiHelper.getTransportEmoji(stop.stops[j].mainTrafficType)+' '+messageHelper.getPlatformTitle(localizedProperties, stop.stops[j], stopName),
+                                            callback_data: 'Platform:'+stop.stops[j].platform+';StopName:'+stop.name
+                                        });
                                 }                     
                             }
                             var options = {
@@ -54,7 +46,7 @@ const process = async (bot, query, language) => {
                                 parse_mode: "HTML"
                             };
                             messageHelper.deleteMessage(bot, query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                                bot.sendMessage(query.message.chat.id ?? process.env.clientId, "<b>"+stop.name+"</b>. "+messageHelper.getSelectStopMessage(localizedProperties), options); 
+                                bot.sendVenue(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon, stop.name, messageHelper.getSelectStopMessage(localizedProperties), options)
                             });
                         } else {
                             var gtfsIds = [];
