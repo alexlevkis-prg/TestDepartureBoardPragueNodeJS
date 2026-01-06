@@ -1,5 +1,6 @@
 const emojiHelper = require('./emojiHelper');
-function buildDepartureBoardMessage(departureBoard, stopName, infoTexts) {
+
+function buildDepartureBoardMessage(departureBoard, stopName, infoTexts, localizedProperties) {
     var stringBuilder = [];
     stringBuilder.push("<b>"+stopName.toUpperCase()+"</b> 🚏\r\n\r\n");
     if (infoTexts && infoTexts.length > 0) {
@@ -10,7 +11,7 @@ function buildDepartureBoardMessage(departureBoard, stopName, infoTexts) {
         departureBoard.forEach(db => {
             if (db.length > 0) {
                 var platformCode = db[0].stop.platform_code;
-                stringBuilder.push("<b>Platform "+platformCode+"</b>\r\n");
+                stringBuilder.push("<b>"+getPlatformTitle(localizedProperties)+" "+platformCode+"</b>\r\n");
                 db.forEach(platformDeparture => {
                     var platformInfoTexts = infoTexts.filter(i => i.related_stops.some(s => s === platformDeparture.stop.id));
                     putInfoTexts(platformInfoTexts, stringBuilder);
@@ -20,17 +21,17 @@ function buildDepartureBoardMessage(departureBoard, stopName, infoTexts) {
                     stringBuilder.push("<b>"+platformDeparture.route.short_name+"</b>  ->  ");
                     stringBuilder.push("<b>"+platformDeparture.trip.headsign+"</b>    ");
                     if (platformDeparture.trip.is_canceled) {
-                        stringBuilder.push("<b>cancelled</b>❌");
+                        stringBuilder.push("<b>"+getCancelledTitle(localizedProperties)+"</b>❌");
                     } else {
                         var delayInMinutes = Math.round((platformDeparture.departure.delay_seconds ?? 0) / 60);
                         if (platformDeparture.departure.minutes === 0 && delayInMinutes === 0) {
-                            stringBuilder.push("<b>arrived</b>✅");
+                            stringBuilder.push("<b>"+getArrivedTitle(localizedProperties)+"</b>✅");
                         } else if (platformDeparture.departure.minutes === 0 && delayInMinutes > 0) {
-                            stringBuilder.push("delaying for "+delayInMinutes+" "+getMinuteTitle(delayInMinutes));
+                            stringBuilder.push(getDelayingForTitle(localizedProperties)+" "+delayInMinutes+" "+getMinuteTitle(delayInMinutes, localizedProperties, false));
                         } else {
-                            stringBuilder.push("in "+platformDeparture.departure.minutes+" "+getMinuteTitle(platformDeparture.departure.minutes)+" ");
+                            stringBuilder.push(getInTitle(localizedProperties)+" "+platformDeparture.departure.minutes+" "+getMinuteTitle(platformDeparture.departure.minutes, localizedProperties, false)+" ");
                             if (delayInMinutes > 0) {
-                                stringBuilder.push("(delay: <i>"+delayInMinutes+" "+getMinuteTitle(delayInMinutes)+"</i>)");
+                                stringBuilder.push("("+getDelayTitle(localizedProperties)+": <i>"+delayInMinutes+" "+getMinuteTitle(delayInMinutes, localizedProperties, true)+"</i>)");
                             }
                         }
                     }
@@ -40,10 +41,13 @@ function buildDepartureBoardMessage(departureBoard, stopName, infoTexts) {
             }  
         });
     } else {
-        stringBuilder.push("Sorry but there are no any available public transport at that moment. Please try another stop. \r\n");
+        stringBuilder.push(getNoPublicTransportMessage(localizedProperties));
     } 
-    
     return stringBuilder.join("");
+}
+
+function buildSettingsMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key ==='SettingsMessage')?.value ?? '';
 }
 
 function putInfoTexts(infos, sb) {
@@ -61,8 +65,96 @@ function putInfoTexts(infos, sb) {
     }
 }
 
-function getMinuteTitle(minutes) {
-    return minutes > 1 ? "minutes" : "minute";
+function getNoSuggestionsMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'NoSuggestionsMessage')?.value ?? '';
 }
 
-module.exports = { buildDepartureBoardMessage }
+function getSelectSuggestionMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'SelectSuggestionMessage')?.value ?? '';
+}
+
+function getSelectStopMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'SelectStopMessage')?.value ?? '';
+}
+
+function getNoPublicTransportMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'NoPublicTransportMessage')?.value ?? '';
+}
+
+function getDelayTitle(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'DelayTitle')?.value ?? '';
+}
+
+function getInTitle(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'InTitle')?.value ?? '';
+}
+
+function getDelayingForTitle(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'DelayingForTitle')?.value ?? '';
+}
+
+function getArrivedTitle(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'ArrivedTitle')?.value ?? '';
+}
+
+function getPlatformTitle(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'PlatformTitle')?.value ?? '';
+}
+
+function getCancelledTitle(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'CancelledTitle')?.value ?? '';
+}
+
+function getMinuteTitle(minutes, localizedProperties, nominative) {
+    var result = '';
+    if (minutes == 1 && nominative) {
+        result = localizedProperties.find(x => x.key == 'MinuteTitleNominative')?.value ?? '';
+    } else if (minutes == 1 && !nominative) {
+        result = localizedProperties.find(x => x.key == 'MinuteTitleNonNominative')?.value ?? '';
+    } else if (minutes >= 2 && minutes <= 4) {
+        result = localizedProperties.find(x => x.key == 'Minutes2to4Title')?.value ?? '';
+    } else {
+        result = localizedProperties.find(x => x.key == 'MinutesMore5Title')?.value ?? '';
+    }
+    return result;
+}
+
+function buildLanguageChangedMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'LanguageChangedMessage')?.value ?? '';
+}
+
+function buildWelcomeMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'WelcomeMessage')?.value ?? '';
+}
+
+function buildHelpMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'HelpMessage')?.value ?? '';
+}
+
+function deleteMessage(bot, chatId, messageId) {
+    return new Promise((resolve, reject) => {
+        if (messageId > 0) {
+            bot.deleteMessage(chatId, messageId).then(() => {
+                resolve(true);
+            }).catch((ex) => {
+                console.error(ex.message);
+                reject(false);
+            });
+        } else {
+            resolve(true)
+        }
+    });
+}
+
+module.exports = { 
+    buildDepartureBoardMessage,
+    buildWelcomeMessage,
+    getSelectSuggestionMessage,
+    getNoSuggestionsMessage,
+    deleteMessage,
+    getPlatformTitle,
+    getSelectStopMessage,
+    buildSettingsMessage,
+    buildLanguageChangedMessage,
+    buildHelpMessage
+}

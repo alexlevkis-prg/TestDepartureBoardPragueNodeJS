@@ -1,0 +1,20 @@
+[
+    {"key": "SettingsMessage", "value": "Please choose a language \r\n"},
+    {"key": "NoSuggestionsMessage", "value": "Sorry but there are no any suggestions by your text. Please try to type another one."},
+    {"key": "SelectSuggestionMessage", "value": "Please select suggestion"},
+    {"key": "SelectStopMessage", "value": "Please select stop"},
+    {"key": "NoPublicTransportMessage", "value": "Sorry but there are no any available public transport at that moment. Please try another stop. \r\n"},
+    {"key": "DelayTitle", "value": "delay"},
+    {"key": "InTitle", "value": "in"},
+    {"key": "DelayingForTitle", "value": "delaying for"},
+    {"key": "ArrivedTitle", "value": "arrived"},
+    {"key": "PlatformTitle", "value": "Platform"},
+    {"key": "CancelledTitle", "value": "cancelled"},
+    {"key": "MinuteTitleNominative", "value": "minute"},
+    {"key": "MinuteTitleNonNominative", "value": "minute"},
+    {"key": "Minutes2to4Title", "value": "minutes"},
+    {"key": "MinutesMore5Title", "value": "minutes"},
+    {"key": "LanguageChangedMessage", "value": "The language setting has been changed"},
+    {"key": "WelcomeMessage", "value": "Welcome to the <b>Departure Board. Prague</b> bot.\r\nTo start using it please type here the stop/station name.\r\n<b><i>(The bot supports Cyrilic letters.)</i></b>\r\nThe bot will return you info about the nearest public transport for your stop/station\r\nIf your stop/station has multiple transport types, the bot will suggest you to select particular one.\r\n"},
+    {"key": "HelpMessage", "value": "This bot has several commands: \r\n\t/start - Starts bot conversation \r\n\t/settings - Allows you select language \r\n\t/help - Shows help message \r\n"}
+]

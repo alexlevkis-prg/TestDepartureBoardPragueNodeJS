@@ -1,0 +1,20 @@
+[
+    {"key": "SettingsMessage", "value": "Будь ласка, виберіть мову \r\n"},
+    {"key": "NoSuggestionsMessage", "value": "Вибачте, але немає варіантів на Ваш запит. Будь ласка, спробуйте ввести інший текст"},
+    {"key": "SelectSuggestionMessage", "value": "Будь ласка, виберіть варіант"},
+    {"key": "SelectStopMessage", "value": "Будь ласка, виберіть зупинку"},
+    {"key": "NoPublicTransportMessage", "value": "На жаль, зараз тут немає доступного транспорту. Спробуйте іншу зупинку. \r\n"},
+    {"key": "DelayTitle", "value": "запізнення"},
+    {"key": "InTitle", "value": "через"},
+    {"key": "DelayingForTitle", "value": "спізнюється на"},
+    {"key": "ArrivedTitle", "value": "прибув"},
+    {"key": "PlatformTitle", "value": "Зупинка"},
+    {"key": "CancelledTitle", "value": "скасован"},
+    {"key": "MinuteTitleNominative", "value": "хвилина"},
+    {"key": "MinuteTitleNonNominative", "value": "хвилину"},
+    {"key": "Minutes2to4Title", "value": "хвилини"},
+    {"key": "MinutesMore5Title", "value": "хвилин"},
+    {"key": "LanguageChangedMessage", "value": "Мова інтерфейсу була змінена"},
+    {"key": "WelcomeMessage", "value": "Ласкаво просимо в <b>Departure Board. Prague</b> бот.\r\nДля початку використання, будь ласка, введіть назву зупинки/станції.\r\n<b><i>(Бот підтримує також і кирилицю.)</i></b>\r\nЗа назвою станції/зупинки бот видасть Вам інформацію про найближчий транспорт.\r\nЯкщо зупинка/станція є спільною для кількох видів транспорту, бот запропонує Вам обрати конкретний\r\n"},
+    {"key": "HelpMessage", "value": "Цей бот має кілька команд: \r\n\t/start - Початок чату з ботом \r\n\t/settings - Дозволяє Вам вибрати мову інтерфейсу \r\n\t/help - Допомога \r\n"}
+]

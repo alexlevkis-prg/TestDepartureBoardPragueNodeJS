@@ -1,203 +1,96 @@
 const TelegramBot = require('node-telegram-bot-api');
-const requestHelper = require('./helpers/requestHelper');
-const emojiHelper = require('./helpers/emojiHelper');
-const messageHelper = require('./helpers/messageHelper');
-const suggestionHelper = require('./helpers/suggestionHelper');
+const messageProcessor = require('./processors/messageProcessor');
+const callbackProcessor = require('./processors/callbackProcessor');
+const startCommand = require('./commands/startCommand');
+const settingsCommand = require('./commands/settingsCommand');
+const helpCommand = require('./commands/helpCommand');
 const config = require('./config');
+const path = require('path');
+const fullPath = path.resolve("data/userLangs.json");
+
 const fs = require('fs');
 
 require('dotenv').config();
 const token = config.clientToken;
 const bot = new TelegramBot(token, {polling: true});
+bot.setMyCommands([
+    { 
+        command: '/start',
+        description: 'Starts bot conversation'
+    },
+    { 
+        command: '/help',
+        description: 'Help information'
+    },
+    { 
+        command: '/settings',
+        description: 'Bot settings'
+    }
+]);
 
 bot.on('message', async (msg) => {
-    try {
-        const chatId = msg.chat.id ?? process.env.clientId;
-        if (msg.text == null || msg.text == undefined) {
-            return;
-        } else if (msg.text == "/start") {
-            const opts = {
-                parse_mode: "HTML"
-            }
-            bot.sendMessage(chatId, "Welcome to the <b>Departure Board</b>. Prague bot. \r\nTo start using it please type here the stop/station name in <b>Czech</b> language \r\nThe bot will return you info about the nearest public transport for your stop/station \r\nIf your stop/station has multiple transport types, the bot will suggest you to select particular one.", opts);
-        } else {
-            fs.readFile('stops.json', (err, data) => {
-                if (err) {
-                    console.error("Error reading file: ", err);
-                    return;
-                }
-                const result = JSON.parse(data);
-                console.log("File has been read");
-                var stopNameVariations = suggestionHelper.getSuggestion(msg.text.toLowerCase());
-                let stops = result.stopGroups.reduce((acc, sg) => {
-                    if (stopNameVariations.some(s => sg.name.toLowerCase().includes(s)) 
-                        && (sg.stops.every(p => p.zone.includes("P")) || sg.stops.every(p => (p.zone.includes("0") && p.zone !== "10") || sg.stops.every(p => p.zone.includes("B"))))) {
-                        acc.push(sg);
-                    }
-                    return acc;
-                }, []);
-                if(stops.length >= 1) {
-                    let buttonsArray = [];
-                    for(let i = 0; i < stops.length; i++) {
-                        if (i % 2 == 0) {
-                            buttonsArray.push([]);
-                            buttonsArray[buttonsArray.length - 1].push({text: stops[i].name, callback_data: 'Stop:'+stops[i].name});
-                        } else {
-                            buttonsArray[buttonsArray.length - 1].push({text: stops[i].name, callback_data: 'Stop:'+stops[i].name});
-                        }
-                    }
-                    var options = {
-                        reply_markup: JSON.stringify({
-                            inline_keyboard: buttonsArray
-                        })
-                    };
-                    bot.sendMessage(msg.chat.id ?? process.env.clientId, "Please select suggestion", options);
-                } else {
-                    bot.sendMessage(msg.chat.id ?? process.env.clientId, "Sorry but there are no any suggestions by your text. Please try to type another one.");
-                }
-            });     
-        }
-    } catch (ex) {
-        console.error(ex.message);
+    if (msg.text.startsWith("/")) {
+        return;
     }
+    fs.readFile(fullPath, (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            var userLangs = JSON.parse(data);
+            var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
+            messageProcessor.process(bot, msg, userLang ?? 'en');
+        }
+    });
 });
 
 bot.on('callback_query', async function onCallbackQuery(query) {
-    try {
-        const data = query.data;
-        if (data.includes('Stop:')) { //processing selected stop
-            var arr = data.split(':');
-            var stopName = arr[arr.length - 1];
-            suggestionMessageId = query.message.message_id;
-            fs.readFile('stops.json', (err, d) => {
-                if (err) {
-                    console.error("Error reading file: ", err);
-                    return;
-                }
-                const result = JSON.parse(d);
-                console.log("File has been read");
-                let stop = result.stopGroups.find(sg => sg.name == stopName 
-                    && (sg.stops.every(p => p.zone.includes("P")) || sg.stops.every(p => (p.zone.includes("0") && p.zone !== "10") || sg.stops.every(p => p.zone.includes("B")))));
-                if (stop){
-                    if (stop.stops.length > 2) {
-                        let buttonsArray = [];
-                        for(let j = 0; j < stop.stops.length; j++) {
-                            if (stop.stops[j].mainTrafficType !== "unknown" || stop.stops[j].mainTrafficType !== "undefined") {
-                                if (j % 2 == 0) {
-                                    buttonsArray.push([]); 
-                                    buttonsArray[buttonsArray.length - 1]
-                                        .push({
-                                            text: emojiHelper.getTransportEmoji(stop.stops[j].mainTrafficType)+' Platform '+stop.stops[j].platform,
-                                            callback_data: 'Platform:'+stop.stops[j].platform+';StopName:'+stop.name
-                                        });
-                                } else {
-                                    buttonsArray[buttonsArray.length - 1]
-                                        .push({
-                                            text: emojiHelper.getTransportEmoji(stop.stops[j].mainTrafficType)+' Platform '+stop.stops[j].platform,
-                                            callback_data: 'Platform:'+stop.stops[j].platform+';StopName:'+stop.name
-                                        });
-                                }
-                            }                     
-                        }
-                        var options = {
-                            reply_markup: JSON.stringify({
-                                inline_keyboard: buttonsArray
-                            }),
-                            parse_mode: "HTML"
-                        };
-                        deleteMessage(query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                            bot.sendMessage(query.message.chat.id ?? process.env.clientId, "<b>"+stop.name+"</b>. Please select stop", options);
-                        });
-                    } else {
-                        var gtfsIds = [];
-                        stop.stops.forEach(p => {
-                            gtfsIds.push(p.gtfsIds);
-                        });
-                        requestHelper.getDepartureBoard(gtfsIds).then((departureBoard) => {
-                            var departureBoardObject = JSON.parse(departureBoard);
-                            requestHelper.getInfoTexts(gtfsIds).then((info) => {
-                                var infoTextsObject = JSON.parse(info).infotexts;
-                                var departureBoardMessage = messageHelper.buildDepartureBoardMessage(departureBoardObject, stopName, infoTextsObject);
-                                deleteMessage(query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                                    bot.sendLocation(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon).then(() => {
-                                        var opts = {
-                                            parse_mode: "HTML"
-                                        }
-                                        bot.sendMessage(query.message.chat.id ?? process.env.clientId, departureBoardMessage, opts);
-                                    });
-                                });
-                            });
-                        });
-                    }
-                } else {
-                    var opts = {
-                        parse_mode: "HTML"
-                    }
-                    bot.sendMessage(chatId, "Sorry but no any stops exist with typed text. Please try do another attempt with different text", opts);
-                }
-            })
-        } else if (data.includes("Platform:")) { //processing platform
-            var arr = data.split(';');
-            var stop = arr[arr.length - 1];
-            var platform = arr[0];
-            var stopArr = stop.split(':');
-            var stopName = stopArr[stopArr.length - 1];
-            var platformArr = platform.split(':');
-            var platformCode = platformArr[platformArr.length - 1];
-            fs.readFile('stops.json', (err, d) => {
-                if (err) {
-                    console.error("Error reading file: ", err);
-                    return;
-                }
-                const result = JSON.parse(d);
-                console.log("File has been read");
-                let stop = result.stopGroups.find(sg => sg.name == stopName && sg.municipality == "Praha");
-                var selectedPlatform = stop.stops.find(s => s.platform === platformCode);
-                if (stop) {
-                    var gtfsIds = stop.stops.find(p => p.platform == platformCode).gtfsIds;
-                    var lat = stop.stops.find(p => p.platform == platformCode).lat;
-                    var lon = stop.stops.find(p => p.platform == platformCode).lon;
-                    requestHelper.getDepartureBoard(gtfsIds).then((departureBoard) => {
-                        var departureBoardObject = JSON.parse(departureBoard);
-                        requestHelper.getInfoTexts(gtfsIds).then((info) => {
-                            var infoTextsObject = JSON.parse(info).infotexts;
-                            var departureBoardMessage = messageHelper.buildDepartureBoardMessage(departureBoardObject, selectedPlatform.altIdosName, infoTextsObject);
-                            deleteMessage(query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                                bot.sendLocation(query.message.chat.id ?? process.env.clientId, lat, lon).then(() => {
-                                    var opts = {
-                                        parse_mode: "HTML"
-                                    }
-                                    bot.sendMessage(query.message.chat.id ?? process.env.clientId, departureBoardMessage, opts);
-                                });
-                            });
-                            
-                        });
-                    });
-                    
-                } else {
-                    var opts = {
-                        parse_mode: "HTML"
-                    }
-                    bot.sendMessage(chatId, "Sorry but no any stops exist with typed text. Please try do another attempt with different text", opts);
-                }
-            });
-        }
-    } catch (ex) {
-        console.error(ex.message);
+    if (config.supportedLanguage.includes(query.data)) {
+        callbackProcessor.setLanguage(bot, query.message.chat.id, query);
+    } else {
+        fs.readFile(fullPath, (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                var userLangs = JSON.parse(data);
+                var userLang = userLangs.find(x => x.key == query.from.id)?.value ?? query.from.language_code;
+                callbackProcessor.process(bot, query, userLang ?? 'en');
+            }
+        });
     }
 });
 
-function deleteMessage(chatId, messageId) {
-    return new Promise((resolve, reject) => {
-        if (messageId > 0) {
-            bot.deleteMessage(chatId, messageId).then(() => {
-                resolve(true);
-            }).catch((ex) => {
-                console.error(ex.message);
-                reject(false);
-            });
+bot.onText(/\/start/, (msg, match) => {
+    fs.readFile(fullPath, (err, data) => {
+        if (err) {
+            console.error(err);
         } else {
-            resolve(true)
+            var userLangs = JSON.parse(data);
+            var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
+            startCommand.command(bot, msg.chat.id ?? process.env.clientId, userLang ?? 'en');
         }
     });
-}
+});
+
+bot.onText(/\/settings/, (msg, match) => {
+    fs.readFile(fullPath, (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            var userLangs = JSON.parse(data);
+            var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
+            settingsCommand.command(bot, msg.chat.id ?? process.env.clientId, userLang ?? 'en');
+        }
+    });
+});
+
+bot.onText(/\/help/, (msg, match) => {
+    fs.readFile(fullPath, (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            var userLangs = JSON.parse(data);
+            var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
+            helpCommand.command(bot, msg.chat.id ?? process.env.clientId, userLang ?? 'en');
+        }
+    });
+});
