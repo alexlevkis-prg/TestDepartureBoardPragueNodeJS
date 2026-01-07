@@ -22,5 +22,10 @@
     {"key": "MinutesMore5Title", "value": "minut"},
     {"key": "LanguageChangedMessage", "value": "Nastavení jazyka bylo změněno"},
     {"key": "WelcomeMessage", "value": "Vítejte v <b>Departure Board. Prague</b> bot.\r\nChcete-li jej začít používat, zadejte sem název zastávky/stanice.\r\n<b><i>(Bot podporuje cyrilici.)</i></b>\r\nBot vám vrátí informace o nejbližší veřejné dopravě k vaší zastávce/stanici\r\nPokud vaše zastávka/stanice nabízí více typů dopravy, bot vám navrhne, abyste si vybrali konkrétní.\r\n"},
-    {"key": "HelpMessage", "value": "Tento bot má několik příkazů: \r\n\t/start - Zahájí konverzaci s botem \r\n\t/settings - Umožňuje vybrat jazyk \r\n\t/help - Zobrazuje zprávu s nápovědou \r\n\r\n\r\nSeznam znaků:\r\n\t1.🚌 - autobus;\r\n\t2.🚎 - trolejbus;\r\n\t3.🚊 - tramvaj;\r\n\t4.🚇 - metro;\r\n\t5.⛴ - přivoz;\r\n\t6.🚋 - vlak;\r\n\t7.🚠 - lanovka\r\n\r\nDalší značky:\r\n\t1.♿️ - doprava dostupná pro osoby se zdravotním postižením\r\n\t2.❄️ - doprava se vybavená klimatizací\r\n\t3.🔋 - doprava se vybavená zásuvkami pro nabíjení zařízení"}
+    {"key": "HelpMessage", "value": "Tento bot má několik příkazů: \r\n\t/start - Zahájí konverzaci s botem \r\n\t/settings - Umožňuje vybrat jazyk \r\n\t/help - Zobrazuje zprávu s nápovědou \r\n\r\n\r\nSeznam znaků:\r\n\t1.🚌 - autobus;\r\n\t2.🚎 - trolejbus;\r\n\t3.🚊 - tramvaj;\r\n\t4.🚇 - metro;\r\n\t5.⛴ - přivoz;\r\n\t6.🚋 - vlak;\r\n\t7.🚠 - lanovka\r\n\r\nDalší značky:\r\n\t1.♿️ - doprava dostupná pro osoby se zdravotním postižením\r\n\t2.❄️ - doprava se vybavená klimatizací\r\n\t3.🔋 - doprava se vybavená zásuvkami pro nabíjení zařízení"},
+    {"key": "SelectLineMessage", "value": "Vyberte prosím spoj"},
+    {"key": "SelectDirectionMessage", "value": "Vyberte prosím směr"},
+    {"key": "NotAvailableLineMessagePart1", "value": "Omlouváme se, ale spoj \"<b>"},
+    {"key": "NotAvailableLineMessagePart2", "value": "\"</b> v tuto chvíli není k dispozici. Zkuste prosím jiný."},
+    {"key": "Back", "value": "<< Zpět"}
 ]

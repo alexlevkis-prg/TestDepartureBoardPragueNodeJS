@@ -1,7 +1,7 @@
 const https = require('https');
 const config = require('../config');
 
-function getDepartureBoard(gtfsIds) {
+function getDepartureBoard(gtfsIds, routeShortName) {
     return new Promise(function(resolve, reject) {
          var options = {
             headers: {
@@ -20,7 +20,8 @@ function getDepartureBoard(gtfsIds) {
                 parameters.push("&");
             }
         }
-        parameters.push("&limit=5");
+        parameters.push("&routeShortNames="+routeShortName);
+        parameters.push("&limit=3");
         parameters.push("&minutesAfter=60");
         var paramString = parameters.join('');
         https.get(config.apiUrl+'/v2/public/departureboards'+paramString, options, response => {

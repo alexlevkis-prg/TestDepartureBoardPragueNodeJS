@@ -29,6 +29,13 @@ function getAdditionalVehicleEmojis(vehicle) {
     return sb.join("");
 }
 
+function isNightLine(isNight) {
+    if (isNight) {
+        return "🌙";
+    }
+    return "";
+}
+
 function getAdditionalPlatformEmojis(platform) {
     if (platform.wheelchairAccess && platform.wheelchairAccess === "possible") {
         return "♿️";
@@ -37,4 +44,4 @@ function getAdditionalPlatformEmojis(platform) {
     }
 }
 
-module.exports = { getTransportEmoji, getAdditionalVehicleEmojis, getAdditionalPlatformEmojis }
+module.exports = { getTransportEmoji, getAdditionalVehicleEmojis, getAdditionalPlatformEmojis, isNightLine }

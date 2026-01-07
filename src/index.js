@@ -38,7 +38,7 @@ bot.on('message', async (msg) => {
         } else {
             var userLangs = JSON.parse(data);
             var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
-            messageProcessor.process(bot, msg, userLang ?? 'en', process.env.stopsUrl);
+            messageProcessor.process(bot, msg.text, msg.chat.id, null, userLang ?? 'en', process.env.stopsUrl);
         }
     });
 });
@@ -53,7 +53,12 @@ bot.on('callback_query', async function onCallbackQuery(query) {
             } else {
                 var userLangs = JSON.parse(data);
                 var userLang = userLangs.find(x => x.key == query.from.id)?.value ?? query.from.language_code;
-                callbackProcessor.process(bot, query, userLang ?? 'en');
+                if (query.data.includes('m:')) {
+                    messageProcessor.process(bot, query.data, query.message.chat.id, query.message.message_id, userLang ?? 'en')
+                }
+                else {
+                    callbackProcessor.process(bot, query, userLang ?? 'en');
+                }
             }
         });
     }
