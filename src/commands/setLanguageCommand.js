@@ -26,7 +26,14 @@ const command = async (bot, chatId, query) => {
                     } else {
                         console.log('User '+ query.from.id + ' added language setting');
                         localizationHelper.readLocalizedProperties('messages', query.data).then((localizedProperties) => {
-                            bot.sendMessage(chatId ?? config.clientId, messageHelper.buildLanguageChangedMessage(localizedProperties));
+                            var opts = {
+                                chat_id: chatId ?? config.clientId,
+                                message_id: query.message.message_id,
+                                reply_markup: null,
+                                parse_mode: "HTML"
+                            }
+                            bot.editMessageText(messageHelper.buildLanguageChangedMessage(localizedProperties), opts);
+                            //bot.sendMessage(chatId ?? config.clientId, messageHelper.buildLanguageChangedMessage(localizedProperties));
                         }); 
                     }
                 });
@@ -38,7 +45,14 @@ const command = async (bot, chatId, query) => {
                     } else {
                         console.log('User '+ query.from.id + ' changed language setting');
                         localizationHelper.readLocalizedProperties('messages', query.data).then((localizedProperties) => {
-                            bot.sendMessage(chatId ?? config.clientId, messageHelper.buildLanguageChangedMessage(localizedProperties));
+                            var opts = {
+                                chat_id: chatId ?? config.clientId,
+                                message_id: query.message.message_id,
+                                reply_markup: null,
+                                parse_mode: "HTML"
+                            }
+                            bot.editMessageText(messageHelper.buildLanguageChangedMessage(localizedProperties), opts);
+                            //bot.sendMessage(chatId ?? config.clientId, messageHelper.buildLanguageChangedMessage(localizedProperties));
                         });
                     }
                 });

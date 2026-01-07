@@ -4,6 +4,7 @@ const localizationHelper = require('../helpers/localizationHelper');
 const path = require('path');
 const fullPath = path.resolve("stops.json");
 const fs = require('fs');
+const config = require('../config');
 
 require('dotenv').config();
 
@@ -56,9 +57,9 @@ const process = async (bot, message, language) => {
                                     inline_keyboard: buttonsArray
                                 })
                             };
-                            bot.sendMessage(message.chat.id ?? process.env.clientId, messageHelper.getSelectSuggestionMessage(localizedProperties), options);
+                            bot.sendMessage(message.chat.id ?? config.clientId, messageHelper.getSelectSuggestionMessage(localizedProperties), options);
                         } else {
-                            bot.sendMessage(message.chat.id ?? process.env.clientId, messageHelper.getNoSuggestionsMessage(localizedProperties));
+                            bot.sendMessage(message.chat.id ?? config.clientId, messageHelper.getNoSuggestionsMessage(localizedProperties));
                         }
                     });
                 } else {

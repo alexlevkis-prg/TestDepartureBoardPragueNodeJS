@@ -6,6 +6,7 @@ const localizationHelper = require('../helpers/localizationHelper');
 const path = require('path');
 const fullPath = path.resolve("stops.json");
 const fs = require('fs');
+const config = require('../config');
 
 require('dotenv').config();
 
@@ -40,14 +41,17 @@ const process = async (bot, query, language) => {
                                 }                     
                             }
                             var options = {
+                                chat_id: query.message.chat.id ?? config.clientId,
+                                message_id: query.message.message_id,
                                 reply_markup: JSON.stringify({
                                     inline_keyboard: buttonsArray
                                 }),
                                 parse_mode: "HTML"
                             };
-                            messageHelper.deleteMessage(bot, query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                                bot.sendVenue(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon, stop.name, messageHelper.getSelectStopMessage(localizedProperties), options)
-                            });
+                            bot.editMessageText("<b>"+stop.name+".</b>"+messageHelper.getSelectStopMessage(localizedProperties), options);
+                            // messageHelper.deleteMessage(bot, query.message.chat.id ?? config.clientId, query.message.message_id).then(() => {
+                            //     bot.sendVenue(query.message.chat.id ?? config.clientId, stop.avgLat, stop.avgLon, stop.name, messageHelper.getSelectStopMessage(localizedProperties), options)
+                            // });
                         } else {
                             var gtfsIds = [];
                             stop.stops.forEach(p => {
@@ -58,14 +62,23 @@ const process = async (bot, query, language) => {
                                 requestHelper.getInfoTexts(gtfsIds).then((info) => {
                                     var infoTextsObject = JSON.parse(info).infotexts;
                                     var departureBoardMessage = messageHelper.buildDepartureBoardMessage(departureBoardObject, stopName, infoTextsObject, localizedProperties);
-                                    messageHelper.deleteMessage(bot, query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                                        bot.sendLocation(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon).then(() => {
-                                            var opts = {
-                                                parse_mode: "HTML"
-                                            }
-                                            bot.sendMessage(query.message.chat.id ?? process.env.clientId, departureBoardMessage, opts);
-                                        });
+                                    bot.sendLocation(query.message.chat.id ?? config.clientId, stop.avgLat, stop.avgLon).then(() =>{
+                                        var opts = {
+                                            chat_id: query.message.chat.id ?? config.clientId,
+                                            message_id: query.message.message_id,
+                                            reply_markup: null,
+                                            parse_mode: "HTML"
+                                        }
+                                        bot.editMessageText(departureBoardMessage, opts);
                                     });
+                                    // messageHelper.deleteMessage(bot, query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
+                                    //     bot.sendLocation(query.message.chat.id ?? process.env.clientId, stop.avgLat, stop.avgLon).then(() => {
+                                    //         var opts = {
+                                    //             parse_mode: "HTML"
+                                    //         }
+                                    //         bot.sendMessage(query.message.chat.id ?? process.env.clientId, departureBoardMessage, opts);
+                                    //     });
+                                    // });
                                 });
                             });
                         }
@@ -104,14 +117,23 @@ const process = async (bot, query, language) => {
                             requestHelper.getInfoTexts(gtfsIds).then((info) => {
                                 var infoTextsObject = JSON.parse(info).infotexts;
                                 var departureBoardMessage = messageHelper.buildDepartureBoardMessage(departureBoardObject, selectedPlatform.altIdosName, infoTextsObject, localizedProperties);
-                                messageHelper.deleteMessage(bot, query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
-                                    bot.sendLocation(query.message.chat.id ?? process.env.clientId, lat, lon).then(() => {
-                                        var opts = {
-                                            parse_mode: "HTML"
-                                        }
-                                        bot.sendMessage(query.message.chat.id ?? process.env.clientId, departureBoardMessage, opts);
-                                    });
+                                bot.sendLocation(query.message.chat.id ?? config.clientId, lat, lon).then(() => {
+                                    var opts = {
+                                        chat_id: query.message.chat.id ?? config.clientId,
+                                        message_id: query.message.message_id,
+                                        reply_markup: null,
+                                        parse_mode: "HTML"
+                                    }
+                                    bot.editMessageText(departureBoardMessage, opts);
                                 });
+                                // messageHelper.deleteMessage(bot, query.message.chat.id ?? process.env.clientId, query.message.message_id).then(() => {
+                                //     bot.sendLocation(query.message.chat.id ?? process.env.clientId, lat, lon).then(() => {
+                                //         var opts = {
+                                //             parse_mode: "HTML"
+                                //         }
+                                //         bot.sendMessage(query.message.chat.id ?? process.env.clientId, departureBoardMessage, opts);
+                                //     });
+                                // });
                             });
                         });
                         
