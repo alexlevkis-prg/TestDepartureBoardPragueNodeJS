@@ -27,5 +27,6 @@
     {"key": "SelectDirectionMessage", "value": "Vyberte prosím směr"},
     {"key": "NotAvailableLineMessagePart1", "value": "Omlouváme se, ale spoj \"<b>"},
     {"key": "NotAvailableLineMessagePart2", "value": "\"</b> v tuto chvíli není k dispozici. Zkuste prosím jiný."},
-    {"key": "Back", "value": "<< Zpět"}
+    {"key": "Back", "value": "<< Zpět"},
+    {"key": "InvalidSymbols", "value": "Zadávání čísel není podporováno. Zkuste prosím zadat něco jiného."}
 ]

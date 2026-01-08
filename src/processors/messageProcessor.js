@@ -14,6 +14,10 @@ const process = async (bot, message, chatId, messageId, language) => {
             return;
         } else {
             let typedText = message;
+            if (typedText.match('\d')) {
+                bot.sendMessage(chatId ?? config.clientId, messageHelper.getInvalidSymbolsMessage(localizedProperties));
+                return;
+            }
             let fromCallback = message.includes('m:');
             if (fromCallback) {
                 typedText = message.split(':')[1];

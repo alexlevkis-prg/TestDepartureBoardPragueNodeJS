@@ -27,5 +27,6 @@
     {"key": "SelectDirectionMessage", "value": "Будь ласка, виберіть напрямок"},
     {"key": "NotAvailableLineMessagePart1", "value": "На жаль, маршрут \"<b>"},
     {"key": "NotAvailableLineMessagePart2", "value": "\"</b> не працює зараз. Будь ласка, спробуйте інший варіант."},
-    {"key": "Back", "value": "<< Назад"}
+    {"key": "Back", "value": "<< Назад"},
+    {"key": "InvalidSymbols", "value": "Введення цифр не підтримується. Будь ласка, спробуйте ввести щось інше."}
 ]

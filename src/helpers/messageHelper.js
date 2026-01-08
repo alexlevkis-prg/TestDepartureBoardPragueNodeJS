@@ -126,6 +126,10 @@ function getBackButtonTitle(localizedProperties) {
     return localizedProperties.find(lp => lp.key === 'Back')?.value ?? '<<';
 }
 
+function getInvalidSymbolsMessage(localizedProperties) {
+    return localizedProperties.find(lp => lp.key === 'InvalidSymbols')?.value ?? '';
+}
+
 function getOnlyPlatformTitle(localizedProperties, transportType) {
     if (transportType.includes("metro")) {
         return localizedProperties.find(lp => lp.key === 'TrackTitle')?.value ?? '';
@@ -220,5 +224,6 @@ module.exports = {
     getBackButtonTitle,
     buildSettingsMessage,
     buildLanguageChangedMessage,
+    getInvalidSymbolsMessage,
     buildHelpMessage
 }

@@ -27,5 +27,6 @@
     {"key": "SelectDirectionMessage", "value": "Пожалуйста выберите направление"},
     {"key": "NotAvailableLineMessagePart1", "value": "К сожалению, маршрут \"<b>"},
     {"key": "NotAvailableLineMessagePart2", "value": "\"</b> не работает в данный момент. Пожалуйста попробуйте другой вариант."},
-    {"key": "Back", "value": "<< Назад"}
+    {"key": "Back", "value": "<< Назад"},
+    {"key": "InvalidSymbols", "value": "Ввод цифр не поддерживается. Пожалуйста, попробуйте ввести что-нибудь другое."}
 ]

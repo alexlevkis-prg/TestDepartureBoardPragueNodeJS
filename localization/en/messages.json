@@ -27,5 +27,6 @@
     {"key": "SelectDirectionMessage", "value": "Please select direction"},
     {"key": "NotAvailableLineMessagePart1", "value": "Sorry but line \"<b>"},
     {"key": "NotAvailableLineMessagePart2", "value": "\"</b> is not working at this moment. Please try to select another one."},
-    {"key": "Back", "value": "<< Back"}
+    {"key": "Back", "value": "<< Back"},
+    {"key": "InvalidSymbols", "value": "Digits are not supported. Please try to type another one."}
 ]
