@@ -14,37 +14,37 @@ const process = async (bot, message, chatId, messageId, language) => {
             return;
         } else {
             let typedText = message;
-            if (typedText.match('\d')) {
-                bot.sendMessage(chatId ?? config.clientId, messageHelper.getInvalidSymbolsMessage(localizedProperties));
-                return;
-            }
-            let fromCallback = message.includes('m:');
-            if (fromCallback) {
-                typedText = message.split(':')[1];
-            }
-            fs.readFile(fullPath, (err, data) => {
-                if (err) {
-                    console.error("Error reading file: ", err);
+            localizationHelper.readLocalizedProperties('messages', language).then((localizedProperties) => {
+                if (typedText.match(/\d/)) {
+                    bot.sendMessage(chatId ?? config.clientId, messageHelper.getInvalidSymbolsMessage(localizedProperties));
                     return;
                 }
-                const result = JSON.parse(data);
-                console.log("File has been read");
-                let stopNameVariations = [];
-                if (message.match(/[a-z]/i)) {
-                    stopNameVariations = suggestionHelper.getSuggestion(typedText.toLowerCase());
-                } else {
-                    var translit = suggestionHelper.translitCyrilicText(typedText.toLowerCase());
-                    stopNameVariations = suggestionHelper.getSuggestion(translit);
+                let fromCallback = message.includes('m:');
+                if (fromCallback) {
+                    typedText = message.split(':')[1];
                 }
-                if (result.stopGroups && result.stopGroups.length > 0) {
-                    let stops = result.stopGroups.reduce((acc, sg) => {
-                    if (stopNameVariations.some(s => sg.name.toLowerCase().includes(s)) 
-                        && (sg.stops.every(p => p.zone.includes("P")) || sg.stops.every(p => (p.zone.includes("0") && p.zone !== "10") || sg.stops.every(p => p.zone.includes("B"))))) {
-                        acc.push(sg);
+                fs.readFile(fullPath, (err, data) => {
+                    if (err) {
+                        console.error("Error reading file: ", err);
+                        return;
                     }
-                    return acc;
-                    }, []);
-                    localizationHelper.readLocalizedProperties('messages', language).then((localizedProperties) => {
+                    const result = JSON.parse(data);
+                    console.log("File has been read");
+                    let stopNameVariations = [];
+                    if (message.match(/[a-z]/i)) {
+                        stopNameVariations = suggestionHelper.getSuggestion(typedText.toLowerCase());
+                    } else {
+                        var translit = suggestionHelper.translitCyrilicText(typedText.toLowerCase());
+                        stopNameVariations = suggestionHelper.getSuggestion(translit);
+                    }
+                    if (result.stopGroups && result.stopGroups.length > 0) {
+                        let stops = result.stopGroups.reduce((acc, sg) => {
+                        if (stopNameVariations.some(s => sg.name.toLowerCase().includes(s)) 
+                            && (sg.stops.every(p => p.zone.includes("P")) || sg.stops.every(p => (p.zone.includes("0") && p.zone !== "10") || sg.stops.every(p => p.zone.includes("B"))))) {
+                            acc.push(sg);
+                        }
+                        return acc;
+                        }, []);
                         if(stops.length >= 1) {
                             let buttonsArray = [];
                             for(let i = 0; i < stops.length; i++) {
@@ -73,14 +73,13 @@ const process = async (bot, message, chatId, messageId, language) => {
                                 };
                                 bot.sendMessage(chatId ?? config.clientId, messageHelper.getSelectSuggestionMessage(localizedProperties), options);
                             }   
-                        } else {
-                            bot.sendMessage(chatId ?? config.clientId, messageHelper.getNoSuggestionsMessage(localizedProperties));
-                        }
-                    });
-                } else {
-                    console.info("no any data has been read");
-                }
-                
+                            } else {
+                                bot.sendMessage(chatId ?? config.clientId, messageHelper.getNoSuggestionsMessage(localizedProperties));
+                            }
+                    } else {
+                        console.info("no any data has been read");
+                    }
+                }); 
             });     
         }
     } catch (ex) {
