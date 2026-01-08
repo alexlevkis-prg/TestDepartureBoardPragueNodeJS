@@ -29,18 +29,20 @@ bot.setMyCommands([
 ]);
 
 bot.on('message', async (msg) => {
-    if (msg.text.startsWith("/")) {
-        return;
-    }
-    fs.readFile(fullPath, (err, data) => {
-        if (err) {
-            console.error(err);
-        } else {
-            var userLangs = JSON.parse(data);
-            var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
-            messageProcessor.process(bot, msg.text, msg.chat.id, null, userLang ?? 'en', process.env.stopsUrl);
+    if (msg.text) {
+        if (msg.text.startsWith("/")) {
+            return;
         }
-    });
+        fs.readFile(fullPath, (err, data) => {
+            if (err) {
+                console.error(err);
+            } else {
+                var userLangs = JSON.parse(data);
+                var userLang = userLangs.find(x => x.key == msg.from.id)?.value ?? msg.from.language_code;
+                messageProcessor.process(bot, msg.text, msg.chat.id, null, userLang ?? 'en', process.env.stopsUrl);
+            }
+        });
+    }
 });
 
 bot.on('callback_query', async function onCallbackQuery(query) {
