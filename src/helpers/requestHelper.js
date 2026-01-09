@@ -1,11 +1,12 @@
 const https = require('https');
 const config = require('../config');
+const dataService = require('../data/dataService');
 
 function getDepartureBoard(gtfsIds, routeShortName) {
     return new Promise(function(resolve, reject) {
          var options = {
             headers: {
-                "X-Access-Token": config.apiToken
+                "X-Access-Token": dataService.getApplicationSetting('apiToken').SettingValue
             }  
         }
         var parameters = [];
@@ -51,7 +52,7 @@ function getInfoTexts(gtfsIds) {
     return new Promise(function(resolve, reject) {
         var options = {
             headers: {
-                "X-Access-Token": config.apiToken
+                "X-Access-Token": dataService.getApplicationSetting('apiToken').SettingValue
             }  
         }
         var parameters = [];

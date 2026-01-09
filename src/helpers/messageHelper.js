@@ -1,6 +1,7 @@
 const emojiHelper = require('./emojiHelper');
+const dataService = require('../data/dataService');
 
-function buildDepartureBoardMessage(departureBoard, stopName, line, isNight, infoTexts, localizedProperties, type) {
+function buildDepartureBoardMessage(departureBoard, stopName, line, isNight, infoTexts, languageCode, type) {
     var stringBuilder = [];
     stringBuilder.push("<b>"+stopName.toUpperCase()+"</b> 🚏\r\n\r\n");
     if (infoTexts && infoTexts.length > 0) {
@@ -9,14 +10,14 @@ function buildDepartureBoardMessage(departureBoard, stopName, line, isNight, inf
     }
     if (departureBoard.length > 0) {
         if (departureBoard.every(x => x.length == 0)) {
-            stringBuilder.push(getNotAvailableLineMessagePart1(localizedProperties)
+            stringBuilder.push(getNotAvailableLineMessagePart1(languageCode)
                 +emojiHelper.getTransportEmoji(type)+emojiHelper.isNightLine(isNight)
-                +line+getNotAvailableLineMessagePart2(localizedProperties));
+                +line+getNotAvailableLineMessagePart2(languageCode));
         } else {
             departureBoard.forEach(db => {
                 if (db.length > 0) {
                     var platformCode = db[0].stop.platform_code;
-                    stringBuilder.push("<b>"+getOnlyPlatformTitle(localizedProperties, db[0].route.type)+" "+platformCode+"</b>\r\n");
+                    stringBuilder.push("<b>"+getOnlyPlatformTitle(languageCode, db[0].route.type)+" "+platformCode+"</b>\r\n");
                     db.forEach(platformDeparture => {
                         var platformInfoTexts = infoTexts.filter(i => i.related_stops.some(s => s === platformDeparture.stop.id));
                         putInfoTexts(platformInfoTexts, stringBuilder);
@@ -29,17 +30,17 @@ function buildDepartureBoardMessage(departureBoard, stopName, line, isNight, inf
                         stringBuilder.push("<b>"+platformDeparture.route.short_name+"</b>  ->  ");
                         stringBuilder.push("<b>"+platformDeparture.trip.headsign+"</b>    ");
                         if (platformDeparture.trip.is_canceled) {
-                            stringBuilder.push("<b>"+getCancelledTitle(localizedProperties)+"</b>❌");
+                            stringBuilder.push("<b>"+getCancelledTitle(languageCode)+"</b>❌");
                         } else {
                             var delayInMinutes = Math.round((platformDeparture.departure.delay_seconds ?? 0) / 60);
                             if (platformDeparture.departure.minutes === 0 && delayInMinutes === 0) {
-                                stringBuilder.push("<b>"+getArrivedTitle(localizedProperties)+"</b>✅");
+                                stringBuilder.push("<b>"+getArrivedTitle(languageCode)+"</b>✅");
                             } else if (platformDeparture.departure.minutes === 0 && delayInMinutes > 0) {
-                                stringBuilder.push(getDelayingForTitle(localizedProperties)+" "+delayInMinutes+" "+getMinuteTitle(delayInMinutes, localizedProperties, false));
+                                stringBuilder.push(getDelayingForTitle(languageCode)+" "+delayInMinutes+" "+getMinuteTitle(delayInMinutes, languageCode, false));
                             } else {
-                                stringBuilder.push(getInTitle(localizedProperties)+" "+platformDeparture.departure.minutes+" "+getMinuteTitle(platformDeparture.departure.minutes, localizedProperties, false)+" ");
+                                stringBuilder.push(getInTitle(languageCode)+" "+platformDeparture.departure.minutes+" "+getMinuteTitle(platformDeparture.departure.minutes, languageCode, false)+" ");
                                 if (delayInMinutes > 0) {
-                                    stringBuilder.push("("+getDelayTitle(localizedProperties)+": <i>"+delayInMinutes+" "+getMinuteTitle(delayInMinutes, localizedProperties, true)+"</i>)");
+                                    stringBuilder.push("("+getDelayTitle(languageCode)+": <i>"+delayInMinutes+" "+getMinuteTitle(delayInMinutes, languageCode, true)+"</i>)");
                                 }
                             }
                         }
@@ -50,13 +51,13 @@ function buildDepartureBoardMessage(departureBoard, stopName, line, isNight, inf
             });
         }
     } else {
-        stringBuilder.push(getNoPublicTransportMessage(localizedProperties));
+        stringBuilder.push(getNoPublicTransportMessage(languageCode));
     } 
     return stringBuilder.join("");
 }
 
-function buildSettingsMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key ==='SettingsMessage')?.value ?? '';
+function buildSettingsMessage(languageCode) {
+    return dataService.getMessageLocalization('SettingsMessage', languageCode)?.Value ?? '';
 }
 
 function putInfoTexts(infos, sb) {
@@ -74,73 +75,73 @@ function putInfoTexts(infos, sb) {
     }
 }
 
-function getNoSuggestionsMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'NoSuggestionsMessage')?.value ?? '';
+function getNoSuggestionsMessage(languageCode) {
+    return dataService.getMessageLocalization('NoSuggestionMessage', languageCode)?.Value ?? '';
 }
 
-function getSelectSuggestionMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'SelectSuggestionMessage')?.value ?? '';
+function getSelectSuggestionMessage(languageCode) {
+    return dataService.getMessageLocalization('SelectSuggestionMessage', languageCode)?.Value ?? '';
 }
 
-function getSelectStopMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'SelectStopMessage')?.value ?? '';
+function getSelectStopMessage(languageCode) {
+    return dataService.getMessageLocalization('SelectStopMessage', languageCode)?.Value ?? '';
 }
 
-function getSelectLineMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'SelectLineMessage')?.value ?? '';
+function getSelectLineMessage(languageCode) {
+    return dataService.getMessageLocalization('SelectLineMessage', languageCode)?.Value ?? '';
 }
 
-function getSelectDirectionMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'SelectDirectionMessage')?.value ?? '';
+function getSelectDirectionMessage(languageCode) {
+    return dataService.getMessageLocalization('SelectDirectionMessage', languageCode)?.Value ?? '';
 }
 
-function getNotAvailableLineMessagePart1(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'NotAvailableLineMessagePart1')?.value ?? '';
+function getNotAvailableLineMessagePart1(languageCode) {
+    return dataService.getMessageLocalization('NotAvailableLineMessagePart1', languageCode)?.Value ?? '';
 }
 
-function getNotAvailableLineMessagePart2(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'NotAvailableLineMessagePart2')?.value ?? '';
+function getNotAvailableLineMessagePart2(languageCode) {
+    return dataService.getMessageLocalization('NotAvailableLineMessagePart2', languageCode)?.Value ?? '';
 }
 
-function getNoPublicTransportMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'NoPublicTransportMessage')?.value ?? '';
+function getNoPublicTransportMessage(languageCode) {
+    return dataService.getMessageLocalization('NoPublicTransportMessage', languageCode)?.Value ?? '';
 }
 
-function getDelayTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'DelayTitle')?.value ?? '';
+function getDelayTitle(languageCode) {
+    return dataService.getMessageLocalization('DelayTitle', languageCode)?.Value ?? '';
 }
 
-function getInTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'InTitle')?.value ?? '';
+function getInTitle(languageCode) {
+    return dataService.getMessageLocalization('InTitle', languageCode)?.Value ?? '';
 }
 
-function getDelayingForTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'DelayingForTitle')?.value ?? '';
+function getDelayingForTitle(languageCode) {
+    return dataService.getMessageLocalization('DelayingForTitle', languageCode)?.Value ?? '';
 }
 
-function getArrivedTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'ArrivedTitle')?.value ?? '';
+function getArrivedTitle(languageCode) {
+    return dataService.getMessageLocalization('ArrivedTitle', languageCode)?.Value ?? '';
 }
 
-function getBackButtonTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'Back')?.value ?? '<<';
+function getBackButtonTitle(languageCode) {
+    return dataService.getMessageLocalization('Back', languageCode)?.Value ?? '<<';
 }
 
-function getInvalidSymbolsMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'InvalidSymbols')?.value ?? '';
+function getInvalidSymbolsMessage(languageCode) {
+    return dataService.getMessageLocalization('InvalidSymbols', languageCode)?.Value ?? '';
 }
 
-function getOnlyPlatformTitle(localizedProperties, transportType) {
+function getOnlyPlatformTitle(languageCode, transportType) {
     if (transportType.includes("metro")) {
-        return localizedProperties.find(lp => lp.key === 'TrackTitle')?.value ?? '';
+        return dataService.getMessageLocalization('TrackTitle', languageCode)?.Value ?? '';
     } else if(transportType.includes("train")) { 
-        return localizedProperties.find(lp => lp.key === 'StationTitleFull')?.value ?? '';
+        return dataService.getMessageLocalization('StationTitleFull', languageCode)?.Value ?? '';
     } else {
-        return localizedProperties.find(lp => lp.key === 'PlatformTitleFull')?.value ?? '';
+        return dataService.getMessageLocalization('PlatformTitleFull', languageCode)?.Value ?? '';
     }
 }
 
-function getPlatformTitle(localizedProperties, platform, stopName) {
+function getPlatformTitle(languageCode, platform, stopName) {
     if (stopName != platform.altIdosName) {
         var point = '';
         if (platform.mainTrafficType.includes("metro")) {
@@ -150,7 +151,7 @@ function getPlatformTitle(localizedProperties, platform, stopName) {
         } else {
             point = 'PlatformTitleShort'
         }
-        var localizedPlatformTitle = localizedProperties.find(lp => lp.key === point)?.value ?? '';
+        var localizedPlatformTitle = dataService.getMessageLocalization(point, languageCode)?.Value ?? '';
         return localizedPlatformTitle+" "+platform.platform+" "+platform.altIdosName.replace(stopName, '').trim();
     }
     var point = '';
@@ -161,38 +162,38 @@ function getPlatformTitle(localizedProperties, platform, stopName) {
         } else {
             point = 'PlatformTitleFull'
         }
-    var localizedPlatformTitle = localizedProperties.find(lp => lp.key === point)?.value ?? '';
+    var localizedPlatformTitle = dataService.getMessageLocalization(point, languageCode)?.Value ?? '';
     return localizedPlatformTitle+" "+platform.platform
 }
 
-function getCancelledTitle(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'CancelledTitle')?.value ?? '';
+function getCancelledTitle(languageCode) {
+    return dataService.getMessageLocalization('CancelledTitle', languageCode)?.Value ?? '';
 }
 
-function getMinuteTitle(minutes, localizedProperties, nominative) {
+function getMinuteTitle(minutes, languageCode, nominative) {
     var result = '';
     if (minutes == 1 && nominative) {
-        result = localizedProperties.find(x => x.key == 'MinuteTitleNominative')?.value ?? '';
+        result = dataService.getMessageLocalization('MinuteTitleNominative', languageCode)?.Value ?? '';
     } else if (minutes == 1 && !nominative) {
-        result = localizedProperties.find(x => x.key == 'MinuteTitleNonNominative')?.value ?? '';
+        result = dataService.getMessageLocalization('MinuteTitleNonNominative', languageCode)?.Value ?? '';
     } else if (minutes >= 2 && minutes <= 4) {
-        result = localizedProperties.find(x => x.key == 'Minutes2to4Title')?.value ?? '';
+        result = dataService.getMessageLocalization('Minutes2to4Title', languageCode)?.Value ?? '';
     } else {
-        result = localizedProperties.find(x => x.key == 'MinutesMore5Title')?.value ?? '';
+        result = dataService.getMessageLocalization('MinutesMore5Title', languageCode)?.Value ?? '';
     }
     return result;
 }
 
-function buildLanguageChangedMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'LanguageChangedMessage')?.value ?? '';
+function buildLanguageChangedMessage(languageCode) {
+    return dataService.getMessageLocalization('LanguageChangedMessage', languageCode)?.Value ?? '';
 }
 
-function buildWelcomeMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'WelcomeMessage')?.value ?? '';
+function buildWelcomeMessage(languageCode) {
+    return dataService.getMessageLocalization('WelcomeMessage', languageCode)?.Value ?? '';
 }
 
-function buildHelpMessage(localizedProperties) {
-    return localizedProperties.find(lp => lp.key === 'HelpMessage')?.value ?? '';
+function buildHelpMessage(languageCode) {
+    return dataService.getMessageLocalization('HelpMessage', languageCode)?.Value ?? '';
 }
 
 function deleteMessage(bot, chatId, messageId) {

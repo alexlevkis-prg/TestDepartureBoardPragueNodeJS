@@ -1,39 +1,26 @@
 const messageHelper = require('../helpers/messageHelper');
-const localizationHelper = require('../helpers/localizationHelper');
+const dataService = require('../data/dataService');
 
 const command = async (bot, chatId, language) => {
-    localizationHelper.readLocalizedProperties('messages', language).then((localizedProperties) => {
-        var settingsMessage = messageHelper.buildSettingsMessage(localizedProperties);
-        let buttonsArray = [];
+    var settingsMessage = messageHelper.buildSettingsMessage(language);
+    var supportedLanguages = dataService.getSupportedLanguages();
+    let buttonsArray = [];
+    for(var i = 0; i < supportedLanguages.length; i++){
         buttonsArray.push([]);
-        buttonsArray[0].push({
-            text: '🇨🇿 Čeština',
-            callback_data: 'cs'
-        });
-        buttonsArray.push([]);
-        buttonsArray[1].push({
-            text: '🇬🇧 English',
-            callback_data: 'en'
-        });
-        buttonsArray.push([]);
-        buttonsArray[2].push({
-            text: '🇷🇺 Русский',
-            callback_data: 'ru'
-        });
-        buttonsArray.push([]);
-        buttonsArray[3].push({
-            text: '🇺🇦 Українська',
-            callback_data: 'uk'
-        });
-        const opts = {
-            parse_mode: "HTML",
-            reply_markup: JSON.stringify({
-                inline_keyboard: buttonsArray,
-                one_time_keyboard: true
-            })
-        }
-        bot.sendMessage(chatId, settingsMessage, opts);
-    });
+        buttonsArray[i].push({
+            text: supportedLanguages[i].LanguageName,
+            callback_data: supportedLanguages[i].LanguageCode
+        })
+    }
+
+    const opts = {
+        parse_mode: "HTML",
+        reply_markup: JSON.stringify({
+            inline_keyboard: buttonsArray,
+            one_time_keyboard: true
+        })
+    }
+    bot.sendMessage(chatId, settingsMessage, opts);
 }
 
 module.exports = { command }
