@@ -10,7 +10,7 @@
   "author": "Aliaksei Kisialev",
   "license": "ISC",
   "dependencies": {
-    "better-sqlite3": "^12.5.0",
+    "better-sqlite3": "^12.6.0",
     "dotenv": "^17.2.3",
     "node-telegram-bot-api": "^0.67.0"
   }
