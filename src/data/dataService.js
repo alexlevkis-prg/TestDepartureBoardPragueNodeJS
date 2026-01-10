@@ -22,6 +22,7 @@ function getApplicationSetting(settingName) {
         var sql = 'SELECT SettingValue FROM Application WHERE SettingName = \'' + settingName + '\'';
         var result = db.prepare(sql).get();
         db.close();
+        console.log(result);
         return result;
     } catch (ex) {
         console.error(ex.message);
