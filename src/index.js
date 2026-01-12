@@ -10,9 +10,7 @@ const crypto = require('crypto');
 const supportedLanguages = dataService.getSupportedLanguages();
 
 require('dotenv').config();
-console.log(dataService.getApplicationSetting('clientToken').SettingValue);
-const tk = dataService.getApplicationSetting('clientToken').SettingValue;
-const token = decrypt(tk);
+const token = decrypt(dataService.getApplicationSetting('clientToken').SettingValue);
 const bot = new TelegramBot(token, {polling: true});
 
 bot.setMyCommands([
